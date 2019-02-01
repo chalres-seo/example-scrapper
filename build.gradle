@@ -1,0 +1,98 @@
+plugins {
+    id 'java'
+    id 'scala'
+}
+
+group 'com.example'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+// Common & Scala
+def scalaVersion = '2.11.12'
+def typeSafeConfig = '1.3.3'
+def scalaLogging = '3.9.0'
+def logbackVersion = '1.2.3'
+def log4jOverSlf4jVersion = '1.7.25'
+
+// Web tools
+def seleniumVersion = '3.141.59'
+def jsoupVersion = '1.11.3'
+
+// Database
+def slickVersion = '3.2.3'
+def mariaDBJdbcVersion = '2.3.0'
+def postgresJdbcVersion = '42.2.5'
+def mysqlJdbcVersion = '8.0.13'
+
+// Util
+def yodaTimeVersion = '2.10'
+def apacheHttpClientVersion = '4.5.6'
+def fasterxmlJacsonVersion = '2.9.7'
+
+// Test
+def junitVersion = '4.12'
+def h2DBVersion = '1.4.197'
+
+// Common & Scala
+dependencies {
+    compile group: 'org.scala-lang', name: 'scala-library', version: scalaVersion
+    compile group: 'com.typesafe', name: 'config', version: typeSafeConfig
+    compile group: 'com.typesafe.scala-logging', name: 'scala-logging_2.11', version: scalaLogging
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+    compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: log4jOverSlf4jVersion
+}
+
+// Web tools
+dependencies {
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: seleniumVersion
+    compile group: 'org.jsoup', name: 'jsoup', version: jsoupVersion
+}
+
+// Database
+dependencies {
+    compile group: 'com.typesafe.slick', name: 'slick_2.11', version: slickVersion
+    compile group: 'com.typesafe.slick', name: 'slick-hikaricp_2.11', version: slickVersion
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: mariaDBJdbcVersion
+    compile group: 'mysql', name: 'mysql-connector-java', version: mysqlJdbcVersion
+    compile group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
+}
+
+// Util
+dependencies {
+    compile group: 'joda-time', name: 'joda-time', version: yodaTimeVersion
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: fasterxmlJacsonVersion
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: apacheHttpClientVersion
+}
+
+// Test
+dependencies {
+    testCompile group: 'com.typesafe.slick', name: 'slick-testkit_2.11', version: slickVersion
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+    testCompile group: 'com.h2database', name: 'h2', version: h2DBVersion
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "com.example.apps.Application"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+tasks.withType(Jar) {
+    destinationDir = file("$rootDir/bin")
+}
+
+
+task(runExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'com.example.apps.Application'
+    classpath = sourceSets.main.runtimeClasspath
+    args 4
+}
